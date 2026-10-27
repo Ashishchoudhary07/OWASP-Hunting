@@ -189,9 +189,30 @@ function renderMarkdown(md: string): string {
       `<a href="${href.startsWith("/") ? SITE_CONFIG.basePath + href : href}">${label}</a>`
     )
     // Lists
-    .replace(/^- (.+)$/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>\n)+/g, (m) => `<ul>${m}</ul>`)
-    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+    .replace(
+      /(^|\n)((?:- .+(?:\n|$))+)/g,
+      (_, prefix, list) => {
+        const items = list
+          .trim()
+          .split("\n")
+          .map((line: string) => `<li>${line.slice(2)}</li>`)
+          .join("");
+        return `${prefix}<ul>${items}</ul>\n`;
+      }
+    )
+    .replace(
+      /(^|\n)((?:\d+\. .+(?:\n|$))+)/g,
+      (_, prefix, list) => {
+        const items = list
+          .trim()
+          .split("\n")
+          .map((line: string) =>
+            `<li>${line.replace(/^\d+\. /, "")}</li>`
+          )
+          .join("");
+        return `${prefix}<ol>${items}</ol>\n`;
+      }
+    )
     // Paragraphs
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br/>");
