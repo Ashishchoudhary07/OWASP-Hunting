@@ -220,5 +220,11 @@ function renderMarkdown(md: string): string {
   if (!html.startsWith("<h") && !html.startsWith("<ul") && !html.startsWith("<ol")) {
     html = `<p>${html}</p>`;
   }
+  // Convert Markdown blockquote paragraphs into semantic blockquotes.
+html = html.replace(
+  /<p>(?:<br\/>)*&gt; ?([\s\S]*?)<\/p>/g,
+  (_, quote: string) =>
+    `<blockquote>${quote.replace(/<br\/>&gt; ?/g, "<br/>")}</blockquote>`
+);
   return html;
 }
